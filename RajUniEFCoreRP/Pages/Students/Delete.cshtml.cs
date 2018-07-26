@@ -17,20 +17,29 @@ namespace RajUniEFCoreRP.Pages.Students
 
         [BindProperty]
         public Student Student { get; set; }
+        public string ErrorMessage { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            Student = await _context.Student.FirstOrDefaultAsync(m => m.ID == id);
+            Student = await _context.Student
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(m => m.ID == id);
 
             if (Student == null)
             {
                 return NotFound();
             }
+
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ErrorMessage = "Delete failed. Try again";
+            }
+
             return Page();
         }
 
@@ -41,15 +50,26 @@ namespace RajUniEFCoreRP.Pages.Students
                 return NotFound();
             }
 
-            Student = await _context.Student.FindAsync(id);
+            Student = await _context.Student
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(m => m.ID == id);
 
-            if (Student != null)
+            if (Student == null)
+            {
+                return NotFound();
+            }
+
+            try
             {
                 _context.Student.Remove(Student);
                 await _context.SaveChangesAsync();
+                return RedirectToPage("./Index");
             }
-
-            return RedirectToPage("./Index");
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.)
+                return RedirectToAction("./Delete", new { id, saveChangesError = true });
+            }            
         }
     }
 }
