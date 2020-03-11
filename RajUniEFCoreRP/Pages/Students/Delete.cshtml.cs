@@ -26,7 +26,7 @@ namespace RajUniEFCoreRP.Pages.Students
                 return NotFound();
             }
 
-            Student = await _context.Student
+            Student = await _context.Students
                                     .AsNoTracking()
                                     .FirstOrDefaultAsync(m => m.ID == id);
 
@@ -50,7 +50,7 @@ namespace RajUniEFCoreRP.Pages.Students
                 return NotFound();
             }
 
-            Student = await _context.Student
+            Student = await _context.Students
                                     .AsNoTracking()
                                     .FirstOrDefaultAsync(m => m.ID == id);
 
@@ -61,7 +61,7 @@ namespace RajUniEFCoreRP.Pages.Students
 
             try
             {
-                _context.Student.Remove(Student);
+                _context.Students.Remove(Student);
                 await _context.SaveChangesAsync();
                 return RedirectToPage("./Index");
             }
