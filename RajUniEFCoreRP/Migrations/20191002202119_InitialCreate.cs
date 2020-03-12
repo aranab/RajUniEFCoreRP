@@ -44,7 +44,7 @@ namespace RajUniEFCoreRP.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CourseID = table.Column<int>(nullable: false),
                     StudentID = table.Column<int>(nullable: false),
-                    Grade = table.Column<int>(nullable: false)
+                    Grade = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
