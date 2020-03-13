@@ -11,9 +11,9 @@ namespace RajUniEFCoreRP.Pages.Instructors
 {
     public class DeleteModel : PageModel
     {
-        private readonly RajUniEFCoreRP.Models.SchoolContext _context;
+        private readonly SchoolContext _context;
 
-        public DeleteModel(RajUniEFCoreRP.Models.SchoolContext context)
+        public DeleteModel(SchoolContext context)
         {
             _context = context;
         }
@@ -44,13 +44,22 @@ namespace RajUniEFCoreRP.Pages.Instructors
                 return NotFound();
             }
 
-            Instructor = await _context.Instructors.FindAsync(id);
+            Instructor = await _context.Instructors
+                .Include(i => i.CourseAssignments)
+                .SingleAsync(i => i.ID == id);
 
-            if (Instructor != null)
+            if (Instructor == null)
             {
-                _context.Instructors.Remove(Instructor);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            var departments = await _context.Departments
+                .Where(d => d.InstructorID == id)
+                .ToListAsync();
+            departments.ForEach(d => d.InstructorID = null);
+
+            _context.Instructors.Remove(Instructor);
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }
